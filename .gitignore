@@ -55,6 +55,5 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
-/PostWebApi/.vs/PostWebApi
-/PostWebApi/.vs/PostWebApi/CopilotIndices/17.14.1701.5382/CodeChunks.db
-/PostWebApi/.vs/PostWebApi/CopilotIndices/17.14.1701.5382/SemanticSymbols.db
+
+PostWebApi/.vs/PostWebApi/
