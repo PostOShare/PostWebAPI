@@ -1,3 +1,6 @@
+using MongoDB.Driver;
+using PostWebApiService.Services;
+
 namespace PostWebApi
 {
     public class Program
@@ -5,6 +8,15 @@ namespace PostWebApi
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            var mongoConnectionString = builder.Configuration.GetConnectionString("PostDefaultConnection");
+
+            builder.Services.AddSingleton<IMongoClient>(sp => new MongoClient(mongoConnectionString));
+            builder.Services.AddScoped(sp => {
+                var client = sp.GetRequiredService<IMongoClient>();
+                return client.GetDatabase("SocialMediaDb");
+            });
+            builder.Services.AddScoped<IPostService, PostService>();
 
             builder.Services.AddControllers();
             builder.Services.AddOpenApi();
