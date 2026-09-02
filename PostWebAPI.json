@@ -1,0 +1,44 @@
+{
+    "id": "post_789",
+    "partitionKey": "user_123",
+    "type": "post",
+    "content": "Look at this amazing sunset!",
+  "media": [
+    {
+      "type": "image",
+      "url": "https://cdn.myapp.com/blobs/sunset.jpg",
+      "createdAt": "2026/08/31 21:30:00",
+      "visibility": "public"
+    }
+  ],
+  "createdAt": "2026/08/31 21:30:00",
+  "lastUpdatedAt": "2026/08/31 21:30:00",
+  "agent": "web",
+  "visibility": "public",
+  "stats": {
+    "thumbsUpReactions": 0,
+    "hahaReactions": 0,
+    "angryReactions": 0,
+    "loveReactions": 0,
+    "comments": 0,
+    "share": 0
+  },
+  "comments": [
+    {
+      "commentId": "c_001",
+      "userId": "user_456",
+      "text": "Sample text",
+      "createdAt": "2026/08/31 21:33:00",
+      "lastUpdatedAt": "2026/08/31 21:33:00",
+      "subComments": [
+        {
+            "subCommentId": "sc_001",
+            "userId": "user_123",
+            "text": "Sample text",
+            "createdAt": "2026/08/31 21:35:00",
+		    "lastUpdatedAt": "2026/08/31 21:30:00"
+        }
+       ]
+    }
+  ]
+}
