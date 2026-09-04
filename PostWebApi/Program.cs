@@ -1,4 +1,6 @@
 using MongoDB.Driver;
+using PostWebApiCommon;
+using PostWebApiCommon.Helpers;
 using PostWebApiService.Services;
 
 namespace PostWebApi
@@ -10,6 +12,13 @@ namespace PostWebApi
             var builder = WebApplication.CreateBuilder(args);
 
             var mongoConnectionString = builder.Configuration.GetConnectionString("PostDefaultConnection");
+            var identityAPIBaseUrl = builder.Configuration[Constants.IdentityAPIBaseUrl];
+
+            builder.Services.AddHttpClient<HttpClientHelper>(client =>
+            {
+                client.BaseAddress = new Uri(identityAPIBaseUrl);
+                client.DefaultRequestHeaders.Add("Accept", "application/json");
+            });
 
             builder.Services.AddSingleton<IMongoClient>(sp => new MongoClient(mongoConnectionString));
             builder.Services.AddScoped(sp => {
@@ -17,10 +26,11 @@ namespace PostWebApi
                 return client.GetDatabase("SocialMediaDb");
             });
             builder.Services.AddScoped<IPostService, PostService>();
+            builder.Services.AddScoped<IHttpClientHelper, HttpClientHelper>();
 
             builder.Services.AddControllers();
             builder.Services.AddOpenApi();
-
+            
             var app = builder.Build();
 
             if (app.Environment.IsDevelopment())
