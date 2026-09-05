@@ -5,5 +5,8 @@
         //configuration
         public const string IdentityAPIBaseUrl = "ExternalAPISettings:IdentityAPIBaseUrl";
         public const string ValidateAccessTokenEndpoint = "ExternalAPISettings:ValidateAccessTokenEndpoint";
+
+        //routes
+        public const string CreatePostRoute = "create-post";
     }
 }
