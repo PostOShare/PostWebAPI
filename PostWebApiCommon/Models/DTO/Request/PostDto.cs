@@ -14,14 +14,6 @@ namespace PostWebApiCommon.Models.DTO.Request
         [Required(ErrorMessage = "partitionKey is required for Cosmos DB compatibility")]
         public string PartitionKey { get; set; }
 
-        [Required(ErrorMessage = "Access token is required")]
-        [JsonPropertyName("accessToken")]
-        public string AccessToken { get; set; }
-
-        [Required(ErrorMessage = "Refresh token is required")]
-        [JsonPropertyName("refreshToken")]
-        public string RefreshToken { get; set; }
-
         [BsonElement("type")]
         public string Type { get; set; }
 

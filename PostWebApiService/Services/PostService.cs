@@ -6,6 +6,7 @@ using PostWebApiCommon.Helpers;
 using PostWebApiCommon.Models.DTO.Request;
 using PostWebApiCommon.Models.DTO.Response;
 using System.Net.Http.Json;
+using System.Security.Claims;
 using PostDto = PostWebApiCommon.Models.DTO.Request.PostDto;
 
 namespace PostWebApiService.Services
@@ -31,32 +32,12 @@ namespace PostWebApiService.Services
         {
             try
             {
-                _logger.LogInformation("Route: {method}, User: {username} | Validating access token: {accesstoken}",
-                                   Constants.CreatePostRoute, postDto.PartitionKey, postDto.AccessToken);
-
-                //Validate that user token is valid
-                var validateTokenRequest = new ValidateTokenRequestDTO { AccessToken = postDto.AccessToken, RefreshToken = postDto.RefreshToken };
-                var validateAccessTokenResponse = await _httpClientHelper.PostAsync<ValidateTokenRequestDTO, AuthResultDTO>(_identityAPIBaseUrl, _validateAccessTokenUri, JsonContent.Create(validateTokenRequest));
-
-                if (validateAccessTokenResponse.Result)
-                {
-                    _logger.LogInformation("Route: {method}, User: {username} | Access token is valid. Creating post.",
+                _logger.LogInformation("Route: {method}, User: {username} | Creating post.",
                                    Constants.CreatePostRoute, postDto.PartitionKey);
 
-                    postDto.Id = $"post_{Guid.NewGuid()}";
-                    await _postsCollection.InsertOneAsync(postDto);
-                }
-                else
-                {
-                    _logger.LogInformation("Route: {method}, User: {username} | Access token is invalid.",
-                                   Constants.CreatePostRoute, postDto.PartitionKey);
-
-                    return new BaseResponseDTO
-                    {
-                        Result = false,
-                        Error = "Invalid access token/ refresh token"
-                    };
-                }
+                postDto.Id = $"post_{Guid.NewGuid()}";
+                await _postsCollection.InsertOneAsync(postDto);
+                
             }
             catch (Exception ex)
             {                
@@ -65,10 +46,89 @@ namespace PostWebApiService.Services
                 throw;
             }
 
+            _logger.LogInformation("Route: {method}, User: {username} | Post created successfully",
+                                                   Constants.CreatePostRoute, postDto.PartitionKey);
+
             return new BaseResponseDTO
             {
                 Result = true,
-                Error = string.Empty
+                ErrorCode = ErrorCodes.Success,
+                ErrorDesc = string.Empty
+            };
+        }
+
+        public async Task<BaseResponseDTO> DeletePost(string postId, string currentUserId)
+        {
+            try
+            {
+                _logger.LogInformation("Route: {method}, Post Id: {postId} | Validating post data",
+                                                   Constants.DeletePostRoute, postId);
+
+                var filter = Builders<PostDto>.Filter.Eq(p => p.Id, postId);
+                var post = await _postsCollection.Find(filter).FirstOrDefaultAsync();
+
+                if (post == null)
+                {
+                    _logger.LogInformation("Route: {method}, Post Id: {postId} | Post not found",
+                                                   Constants.DeletePostRoute, postId);
+
+                    return new BaseResponseDTO
+                    {
+                        Result = false,
+                        ErrorCode = ErrorCodes.PostNotFound,
+                        ErrorDesc = "Post not found."
+                    };
+                }
+
+                _logger.LogInformation("Route: {method}, Post Id: {postId}, Username: {userId} | Identifying whether user is authorized to delete the post",
+                                                   Constants.DeletePostRoute, postId, currentUserId);
+
+                if (post.PartitionKey != currentUserId)
+                {
+                    _logger.LogInformation("Route: {method}, Post Id: {postId}, Username: {userId} | User is not authorized to delete this post",
+                                                   Constants.DeletePostRoute, postId, currentUserId);
+
+                    return new BaseResponseDTO
+                    {
+                        Result = false,
+                        ErrorCode = ErrorCodes.UserNotAuthorizedToDeletePost,
+                        ErrorDesc = "User is not authorized to delete this post."
+                    };
+                }
+
+                _logger.LogInformation("Route: {method}, Post Id: {postId} | Deleting post",
+                                                   Constants.DeletePostRoute, postId);
+
+                var deleteResult = await _postsCollection.DeleteOneAsync(filter);
+
+                if (deleteResult.DeletedCount == 0)
+                {
+                    _logger.LogInformation("Route: {method}, Post Id: {postId} | Failed to delete post",
+                                                   Constants.DeletePostRoute, postId);
+
+                    return new BaseResponseDTO
+                    {
+                        Result = false,
+                        ErrorCode = ErrorCodes.FailedToDeletePost,
+                        ErrorDesc = "Failed to delete post."
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Route: {method}, Post Id: {postId} | Exception occurred while deleting post: {exception}",
+                                   Constants.CreatePostRoute, postId, ex);
+                throw;
+            }
+
+            _logger.LogInformation("Route: {method}, Post Id: {postId} | Post deleted successfully",
+                                                   Constants.DeletePostRoute, postId);
+
+            return new BaseResponseDTO
+            {
+                Result = true,
+                ErrorCode = ErrorCodes.Success,
+                ErrorDesc = string.Empty
             };
         }
     }
