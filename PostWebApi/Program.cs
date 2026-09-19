@@ -47,11 +47,15 @@ namespace PostWebApi
                 {
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"])),
+
                         ValidateLifetime = true,
 
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(
-                            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]))
+                        ValidateIssuer = true,
+                        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+
+                        ValidateAudience = false
                     };
                 });
 
@@ -86,6 +90,7 @@ namespace PostWebApi
                 }
 
                 app.UseHttpsRedirection();
+                app.UseAuthentication();
                 app.UseAuthorization();
                 app.MapControllers();
 
