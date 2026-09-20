@@ -1,13 +1,15 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
 namespace PostWebApiCommon.Models.DTO.Request
 {
+    [BsonIgnoreExtraElements]
     public class PostDto
     {
+        [BsonId]
         [BsonElement("id")]
+        [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
 
         [BsonElement("partitionKey")]

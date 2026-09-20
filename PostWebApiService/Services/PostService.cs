@@ -35,9 +35,7 @@ namespace PostWebApiService.Services
                 _logger.LogInformation("Route: {method}, User: {username} | Creating post.",
                                    Constants.CreatePostRoute, postDto.PartitionKey);
 
-                postDto.Id = $"post_{Guid.NewGuid()}";
-                await _postsCollection.InsertOneAsync(postDto);
-                
+                await _postsCollection.InsertOneAsync(postDto);                
             }
             catch (Exception ex)
             {                
