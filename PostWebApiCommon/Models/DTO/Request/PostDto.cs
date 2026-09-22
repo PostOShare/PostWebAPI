@@ -10,7 +10,7 @@ namespace PostWebApiCommon.Models.DTO.Request
         [BsonId]
         [BsonElement("id")]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
+        public string? Id { get; set; }
 
         [BsonElement("partitionKey")]
         [Required(ErrorMessage = "partitionKey is required for Cosmos DB compatibility")]
