@@ -1,9 +1,12 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
 using PostWebApiCommon;
 using PostWebApiCommon.Helpers;
 using PostWebApiService.Services;
 using Serilog;
 using Serilog.Events;
+using System.Text;
 
 namespace PostWebApi
 {
@@ -39,6 +42,25 @@ namespace PostWebApi
                     client.DefaultRequestHeaders.Add("Accept", "application/json");
                 });
 
+                builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"])),
+
+                        ValidateLifetime = true,
+
+                        ValidateIssuer = true,
+                        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+
+                        ValidateAudience = false
+                    };
+                });
+
+                builder.Services.AddAuthorization();
+
                 builder.Services.AddSingleton<IMongoClient>(sp => new MongoClient(mongoConnectionString));
                 builder.Services.AddScoped(sp =>
                 {
@@ -47,6 +69,8 @@ namespace PostWebApi
                 });
                 builder.Services.AddScoped<IPostService, PostService>();
                 builder.Services.AddScoped<IHttpClientHelper, HttpClientHelper>();
+
+                
 
                 builder.Services.AddControllers();
                 builder.Services.AddOpenApi();
@@ -66,6 +90,7 @@ namespace PostWebApi
                 }
 
                 app.UseHttpsRedirection();
+                app.UseAuthentication();
                 app.UseAuthorization();
                 app.MapControllers();
 

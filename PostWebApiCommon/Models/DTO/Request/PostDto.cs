@@ -1,26 +1,20 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
 namespace PostWebApiCommon.Models.DTO.Request
 {
+    [BsonIgnoreExtraElements]
     public class PostDto
     {
+        [BsonId]
         [BsonElement("id")]
-        public string Id { get; set; }
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string? Id { get; set; }
 
         [BsonElement("partitionKey")]
         [Required(ErrorMessage = "partitionKey is required for Cosmos DB compatibility")]
         public string PartitionKey { get; set; }
-
-        [Required(ErrorMessage = "Access token is required")]
-        [JsonPropertyName("accessToken")]
-        public string AccessToken { get; set; }
-
-        [Required(ErrorMessage = "Refresh token is required")]
-        [JsonPropertyName("refreshToken")]
-        public string RefreshToken { get; set; }
 
         [BsonElement("type")]
         public string Type { get; set; }
