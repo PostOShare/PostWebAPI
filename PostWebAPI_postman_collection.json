@@ -14,7 +14,7 @@
           "bearer": [
             {
               "key": "token",
-              "value": "\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRnZGYiLCJuYmYiOjE3ODk3NDQ2MzcsImV4cCI6MTc4OTc0NTUzNywiaWF0IjoxNzg5NzQ0NjM3fQ.0mGNoJShlVfF5rSXPFUDsDvgJA09UCF2JWYor2895xs\"",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL3d3dy5wb3N0b3NoYXJlLmNvbS8iLCJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IlRlc3QgVXNlciIsImlhdCI6MTc4OTg0NzgzNywiZXhwIjoxNzg5OTM0MjM3fQ.LaNVXO4yL0efjen2ozOVSBEsC9YLJSJQL0lIShB_LB0",
               "type": "string"
             }
           ]
@@ -23,7 +23,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"id\": \"post_789\",\r\n    \"partitionKey\": \"user_123\",\r\n    \"type\": \"post\",\r\n    \"content\": \"Look at this amazing sunset!\",\r\n  \"media\": [\r\n    {\r\n      \"type\": \"image\",\r\n      \"url\": \"https://cdn.myapp.com/blobs/sunset.jpg\",\r\n      \"createdAt\": \"2026/08/31 21:30:00\",\r\n      \"visibility\": \"public\"\r\n    }\r\n  ],\r\n  \"createdAt\": \"2026/08/31 21:30:00\",\r\n  \"lastUpdatedAt\": \"2026/08/31 21:30:00\",\r\n  \"agent\": \"web\",\r\n  \"visibility\": \"public\",\r\n  \"stats\": {\r\n    \"thumbsUpReactions\": 0,\r\n    \"hahaReactions\": 0,\r\n    \"angryReactions\": 0,\r\n    \"loveReactions\": 0,\r\n    \"comments\": 0,\r\n    \"share\": 0\r\n  },\r\n  \"comments\": [\r\n    {\r\n      \"commentId\": \"c_001\",\r\n      \"userId\": \"user_456\",\r\n      \"text\": \"Sample text\",\r\n      \"createdAt\": \"2026/08/31 21:33:00\",\r\n      \"lastUpdatedAt\": \"2026/08/31 21:33:00\",\r\n      \"subComments\": [\r\n        {\r\n            \"subCommentId\": \"sc_001\",\r\n            \"userId\": \"user_123\",\r\n            \"text\": \"Sample text\",\r\n            \"createdAt\": \"2026/08/31 21:35:00\",\r\n\t\t    \"lastUpdatedAt\": \"2026/08/31 21:30:00\"\r\n        }\r\n       ]\r\n    }\r\n  ]\r\n}",
+          "raw": "{\r\n    \"partitionKey\": \"user_123\",\r\n    \"type\": \"post\",\r\n    \"content\": \"Look at this amazing sunset!\",\r\n    \"media\": [\r\n        {\r\n            \"type\": \"image\",\r\n            \"url\": \"https://cdn.myapp.com/blobs/sunset.jpg\",\r\n            \"createdAt\": \"2026/08/31 21:30:00\",\r\n            \"visibility\": \"public\"\r\n        }\r\n    ],\r\n    \"createdAt\": \"2026/08/31 21:30:00\",\r\n    \"lastUpdatedAt\": \"2026/08/31 21:30:00\",\r\n    \"agent\": \"web\",\r\n    \"visibility\": \"public\",\r\n    \"stats\": {\r\n        \"thumbsUpReactions\": 0,\r\n        \"hahaReactions\": 0,\r\n        \"angryReactions\": 0,\r\n        \"loveReactions\": 0,\r\n        \"comments\": 0,\r\n        \"share\": 0\r\n    },\r\n    \"comments\": [\r\n        {\r\n            \"commentId\": \"c_001\",\r\n            \"userId\": \"user_456\",\r\n            \"text\": \"Sample text\",\r\n            \"createdAt\": \"2026/08/31 21:33:00\",\r\n            \"lastUpdatedAt\": \"2026/08/31 21:33:00\",\r\n            \"subComments\": [\r\n                {\r\n                    \"subCommentId\": \"sc_001\",\r\n                    \"userId\": \"user_123\",\r\n                    \"text\": \"Sample text\",\r\n                    \"createdAt\": \"2026/08/31 21:35:00\",\r\n                    \"lastUpdatedAt\": \"2026/08/31 21:30:00\"\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -55,7 +55,7 @@
           "bearer": [
             {
               "key": "token",
-              "value": "\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRnZGYiLCJuYmYiOjE3ODk3NDQ2MzcsImV4cCI6MTc4OTc0NTUzNywiaWF0IjoxNzg5NzQ0NjM3fQ.0mGNoJShlVfF5rSXPFUDsDvgJA09UCF2JWYor2895xs\"",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL3d3dy5wb3N0b3NoYXJlLmNvbS8iLCJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IlRlc3QgVXNlciIsImlhdCI6MTc4OTg0NzgzNywiZXhwIjoxNzg5OTM0MjM3fQ.LaNVXO4yL0efjen2ozOVSBEsC9YLJSJQL0lIShB_LB0",
               "type": "string"
             }
           ]
@@ -63,7 +63,7 @@
         "method": "DELETE",
         "header": [],
         "url": {
-          "raw": "https://localhost:7005/api/v1/post/post_789",
+          "raw": "https://localhost:7005/api/v1/post/6ab286f2a631debb8313cc86",
           "protocol": "https",
           "host": [
             "localhost"
@@ -73,7 +73,7 @@
             "api",
             "v1",
             "post",
-            "post_789"
+            "6ab286f2a631debb8313cc86"
           ]
         }
       },
