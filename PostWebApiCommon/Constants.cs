@@ -9,5 +9,6 @@
         //routes
         public const string CreatePostRoute = "create-post";
         public const string DeletePostRoute = "delete-post";
+        public const string UpdatePostRoute = "update-post";
     }
 }
