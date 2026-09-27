@@ -4,38 +4,51 @@ using MongoDB.Driver;
 using PostWebApiCommon;
 using PostWebApiCommon.Helpers;
 using PostWebApiCommon.Models.DTO.Response;
-using PostDto = PostWebApiCommon.Models.DTO.Request.PostDto;
+using PostDto = PostWebApiCommon.Models.DTO.PostDto;
 
 namespace PostWebApiService.Services
 {
     public class PostService : IPostService
     {
         private readonly IMongoCollection<PostDto> _postsCollection;
-        private string _identityAPIBaseUrl;
-        private string _validateAccessTokenUri;
+        private readonly string _identityAPIBaseUrl;
+        private readonly string _validateAccessTokenUri;
         private IHttpClientHelper _httpClientHelper;
         private readonly ILogger<PostService> _logger;
 
         public PostService(IMongoDatabase database, IConfiguration configuration, IHttpClientHelper httpClientHelper, ILogger<PostService> logger)
         {
             _postsCollection = database.GetCollection<PostDto>("Posts");
-            _identityAPIBaseUrl = configuration[Constants.IdentityAPIBaseUrl];
-            _validateAccessTokenUri = configuration[Constants.ValidateAccessTokenEndpoint];
+            _identityAPIBaseUrl = configuration[Constants.IdentityAPIBaseUrl]!;
+            _validateAccessTokenUri = configuration[Constants.ValidateAccessTokenEndpoint]!;
             _httpClientHelper = httpClientHelper;
             _logger = logger;
         }
 
-        public async Task<BaseResponseDTO> CreatePost(PostDto postDto)
+        public async Task<BaseResponseDTO> CreatePost(PostDto postDto, string currentUserId)
         {
             try
             {
+                if (postDto.PartitionKey != currentUserId)
+                {
+                    _logger.LogInformation("Route: {method}, Post Id: {postId}, Username: {userId} | User is not authorized to create this post",
+                                                   Constants.CreatePostRoute, postDto.Id, currentUserId);
+
+                    return new BaseResponseDTO
+                    {
+                        Result = false,
+                        ErrorCode = ErrorCodes.UserNotAuthorizedToCreatePost,
+                        ErrorDesc = "User is not authorized to create this post."
+                    };
+                }
+
                 _logger.LogInformation("Route: {method}, User: {username} | Creating post.",
                                    Constants.CreatePostRoute, postDto.PartitionKey);
 
-                await _postsCollection.InsertOneAsync(postDto);                
+                await _postsCollection.InsertOneAsync(postDto);
             }
             catch (Exception ex)
-            {                
+            {
                 _logger.LogError("Route: {method}, User: {username} | Exception occurred while saving post: {exception}",
                                    Constants.CreatePostRoute, postDto.PartitionKey, ex);
                 throw;
@@ -200,6 +213,48 @@ namespace PostWebApiService.Services
                 ErrorCode = ErrorCodes.Success,
                 ErrorDesc = string.Empty
             };
+        }
+
+        public async Task<PostResponseDTO> GetAllPostsByUserId(string currentUserId)
+        {
+            try
+            {
+                _logger.LogInformation("Route: {method} | Validating post data", Constants.GetAllPostsByUserIdRoute);
+
+                var filter = Builders<PostDto>.Filter.Eq(p => p.PartitionKey, currentUserId);
+                var posts = await _postsCollection.Find(filter).ToListAsync();
+
+                if (posts == null || posts.Count == 0)
+                {
+                    _logger.LogInformation("Route: {method} | No posts found for user {userId}",
+                                                   Constants.GetAllPostsByUserIdRoute, currentUserId);
+
+                    return new PostResponseDTO
+                    {
+                        Result = false,
+                        ErrorCode = ErrorCodes.PostNotFound,
+                        ErrorDesc = "Posts not found."
+                    };
+                }
+
+
+                _logger.LogInformation("Route: {method} | Posts for user {userId} retrieved",
+                                                   Constants.GetAllPostsByUserIdRoute, currentUserId);
+
+                return new PostResponseDTO
+                {
+                    Result = true,
+                    ErrorCode = ErrorCodes.Success,
+                    ErrorDesc = string.Empty,
+                    Posts = posts
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Route: {method}| Exception occurred while retrieving posts: {exception}",
+                                   Constants.GetAllPostsByUserIdRoute, ex);
+                throw;
+            }
         }
     }
 }

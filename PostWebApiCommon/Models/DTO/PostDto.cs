@@ -1,8 +1,9 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using PostWebApiCommon.Models.DTO.Request;
 using System.ComponentModel.DataAnnotations;
 
-namespace PostWebApiCommon.Models.DTO.Request
+namespace PostWebApiCommon.Models.DTO
 {
     [BsonIgnoreExtraElements]
     public class PostDto

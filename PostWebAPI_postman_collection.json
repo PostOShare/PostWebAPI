@@ -48,6 +48,50 @@
       "response": []
     },
     {
+      "name": "getposts-byuser",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL3d3dy5wb3N0b3NoYXJlLmNvbS8iLCJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IlRlc3QgVXNlciIsImlhdCI6MTc4OTg0NzgzNywiZXhwIjoxNzg5OTM0MjM3fQ.LaNVXO4yL0efjen2ozOVSBEsC9YLJSJQL0lIShB_LB0",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "https://localhost:7005/api/v1/post/getposts-byuser",
+          "protocol": "https",
+          "host": [
+            "localhost"
+          ],
+          "port": "7005",
+          "path": [
+            "api",
+            "v1",
+            "post",
+            "getposts-byuser"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
       "name": "update-post",
       "request": {
         "auth": {
