@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PostWebApiCommon;
 using PostWebApiCommon.Models.DTO;
@@ -50,7 +51,8 @@ namespace PostWebApi.Controllers
                 return Unauthorized(new { message = "Invalid token claims." });
             }
 
-            var response = await _postService.CreatePost(newPost, currentUserId);
+            string? accessToken = await HttpContext.GetTokenAsync("access_token");
+            var response = await _postService.CreatePost(newPost, currentUserId, accessToken!);
 
             try
             {
@@ -103,7 +105,8 @@ namespace PostWebApi.Controllers
                 return Unauthorized(new { message = "Invalid token claims." });
             }
 
-            var response = await _postService.DeletePost(postId, currentUserId);
+            string? accessToken = await HttpContext.GetTokenAsync("access_token");
+            var response = await _postService.DeletePost(postId, currentUserId, accessToken!);
 
             try
             {
@@ -157,7 +160,8 @@ namespace PostWebApi.Controllers
             }
 
             updatedPost.Id = postId;
-            var response = await _postService.UpdatePost(postId, currentUserId, updatedPost);
+            string? accessToken = await HttpContext.GetTokenAsync("access_token");
+            var response = await _postService.UpdatePost(postId, currentUserId, updatedPost, accessToken!);
 
             try
             {
@@ -208,7 +212,8 @@ namespace PostWebApi.Controllers
                 return Unauthorized(new { message = "Invalid token claims." });
             }
 
-            var response = await _postService.GetAllPostsByUserId(currentUserId);
+            string? accessToken = await HttpContext.GetTokenAsync("access_token");
+            var response = await _postService.GetAllPostsByUserId(currentUserId, accessToken!);
 
             try
             {

@@ -60,6 +60,17 @@ namespace PostWebApi
                 });
 
                 builder.Services.AddAuthorization();
+                
+                builder.Services.AddHttpClient(Constants.ExternalHttpClient, client =>
+                {
+                    client.DefaultRequestHeaders.Add("Accept", "application/json");
+
+                    if(!double.TryParse(builder.Configuration["APISettings:Timeout"], out double timeoutInSeconds))
+                    {
+                        timeoutInSeconds = 300;
+                    }
+                    client.Timeout = TimeSpan.FromSeconds(timeoutInSeconds);
+                });
 
                 builder.Services.AddSingleton<IMongoClient>(sp => new MongoClient(mongoConnectionString));
                 builder.Services.AddScoped(sp =>
@@ -69,8 +80,7 @@ namespace PostWebApi
                 });
                 builder.Services.AddScoped<IPostService, PostService>();
                 builder.Services.AddScoped<IHttpClientHelper, HttpClientHelper>();
-
-                
+                builder.Services.AddScoped<IExternalHttpClientHelper, ExternalHttpClientHelper>();
 
                 builder.Services.AddControllers();
                 builder.Services.AddOpenApi();
