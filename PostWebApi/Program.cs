@@ -1,3 +1,12 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using MongoDB.Driver;
+using PostWebApiCommon;
+using PostWebApiCommon.Helpers;
+using PostWebApiService.Services;
+using Serilog;
+using Serilog.Events;
+using System.Text;
 
 namespace PostWebApi
 {
@@ -7,28 +16,105 @@ namespace PostWebApi
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
 
-            builder.Services.AddControllers();
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-            builder.Services.AddOpenApi();
 
-            var app = builder.Build();
+            Log.Logger = new LoggerConfiguration()
+                            .ReadFrom
+                            .Configuration(builder.Configuration).WriteTo.Logger(lc => lc
+                            .Filter.ByIncludingOnly(evt => evt.Level == LogEventLevel.Information || evt.Level == LogEventLevel.Error || evt.Level == LogEventLevel.Fatal)
+                            .WriteTo.File(builder.Configuration.GetSection("Serilog:WriteTo:0:Args:path").Value))
+                            .WriteTo.Logger(lc => lc
+                            .Filter.ByIncludingOnly(evt => evt.Level == LogEventLevel.Error || evt.Level == LogEventLevel.Fatal)
+                            .WriteTo.File(builder.Configuration.GetSection("Serilog:WriteTo:1:Args:path").Value))
+                            .CreateLogger();
+            builder.Host.UseSerilog();
 
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
+            try
             {
-                app.MapOpenApi();
+                Log.Information("Starting the Post API");
+
+                var mongoConnectionString = builder.Configuration.GetConnectionString("PostDefaultConnection");
+                var identityAPIBaseUrl = builder.Configuration[Constants.IdentityAPIBaseUrl];
+
+                builder.Services.AddHttpClient<HttpClientHelper>(client =>
+                {
+                    client.BaseAddress = new Uri(identityAPIBaseUrl);
+                    client.DefaultRequestHeaders.Add("Accept", "application/json");
+                });
+
+                builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"])),
+
+                        ValidateLifetime = true,
+
+                        ValidateIssuer = true,
+                        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+
+                        ValidateAudience = false
+                    };
+                });
+
+                builder.Services.AddAuthorization();
+                
+                builder.Services.AddHttpClient(Constants.ExternalHttpClient, client =>
+                {
+                    client.DefaultRequestHeaders.Add("Accept", "application/json");
+
+                    if(!double.TryParse(builder.Configuration["APISettings:Timeout"], out double timeoutInSeconds))
+                    {
+                        timeoutInSeconds = 300;
+                    }
+                    client.Timeout = TimeSpan.FromSeconds(timeoutInSeconds);
+                });
+
+                builder.Services.AddSingleton<IMongoClient>(sp => new MongoClient(mongoConnectionString));
+                builder.Services.AddScoped(sp =>
+                {
+                    var client = sp.GetRequiredService<IMongoClient>();
+                    return client.GetDatabase("SocialMediaDb");
+                });
+                builder.Services.AddScoped<IPostService, PostService>();
+                builder.Services.AddScoped<IHttpClientHelper, HttpClientHelper>();
+                builder.Services.AddScoped<IExternalHttpClientHelper, ExternalHttpClientHelper>();
+
+                builder.Services.AddControllers();
+                builder.Services.AddOpenApi();
+
+                var app = builder.Build();
+
+                if (app.Environment.IsDevelopment())
+                {
+                    app.MapOpenApi();
+                    app.UseStaticFiles();
+
+                    app.UseSwaggerUI(options =>
+                    {
+                        options.SwaggerEndpoint("/openapi/v1.json", "PostWebApi v1");
+                        options.RoutePrefix = "swagger";
+                    });
+                }
+
+                app.UseModelValidation();
+                app.UseHttpsRedirection();
+                app.UseAuthentication();
+                app.UseAuthorization();
+                app.MapControllers();
+
+                app.Run();
             }
-
-            app.UseHttpsRedirection();
-
-            app.UseAuthorization();
-
-
-            app.MapControllers();
-
-            app.Run();
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "The application failed to start correctly");
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
     }
 }

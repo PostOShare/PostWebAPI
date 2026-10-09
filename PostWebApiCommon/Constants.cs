@@ -1,0 +1,18 @@
+﻿namespace PostWebApiCommon
+{
+    public class Constants
+    {
+        //configuration
+        public const string IdentityAPIBaseUrl = "ExternalAPISettings:IdentityAPIBaseUrl";
+        public const string ValidateAccessTokenEndpoint = "ExternalAPISettings:ValidateAccessTokenEndpoint";
+
+        //routes
+        public const string CreatePostRoute = "create-post";
+        public const string DeletePostRoute = "delete-post";
+        public const string UpdatePostRoute = "update-post";
+        public const string GetAllPostsByUserIdRoute = "getposts-byuser";
+
+        //HttpClients
+        public const string ExternalHttpClient = "ExternalHttpClient";
+    }
+}
