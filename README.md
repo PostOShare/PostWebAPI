@@ -25,3 +25,35 @@ Additionally, it requires that [IdentityWebApi](https://github.com/PostOShare/Id
 - [.NET 6](https://dotnet.microsoft.com/en-us/)
 - [SQL Server](https://www.microsoft.com/en-us/sql-server/sql-server-2022)
 - [SQL Server Management Studio (SSMS)](https://learn.microsoft.com/en-us/sql/ssms/download-sql-server-management-studio-ssms?view=sql-server-ver16)
+
+# Installation
+
+# Installation
+
+Steps that can be used to setup the API are
+
+```cmd
+git clone https://github.com/PostOShare/PostWebApi.git
+
+cd PostWebApi\PostWebApi
+dotnet restore
+```
+
+Before starting the API install the [IdentityWebApi](https://github.com/PostOShare/IdentityWebApi/blob/main/README.md#installation) and execute this API. Then execute the PostWebApi.
+
+# Dependencies
+
+## Production dependencies
+
+-  Microsoft.AspNetCore.Authorization
+-  Microsoft.AspNetCore.Authentication.JwtBearer
+-  Serilog.AspNetCore
+-  Serilog.Sinks.File
+
+## Development dependencies
+
+These dependencies are used only in development:
+
+- Swashbuckle.AspNetCore
+- Swashbuckle.AspNetCore.Annotations
+- Microsoft.AspNetCore.OpenApi
