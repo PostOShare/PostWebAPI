@@ -49,6 +49,11 @@ Before starting the API install the [IdentityWebApi](https://github.com/PostOSha
 -  Microsoft.AspNetCore.Authentication.JwtBearer
 -  Serilog.AspNetCore
 -  Serilog.Sinks.File
+-  Microsoft.Extensions.Http
+-  MongoDB.Bson
+-  Microsoft.AspNetCore.Http
+-  Microsoft.Extensions.Configuration.Abstractions
+-  MongoDB.Driver
 
 ## Development dependencies
 
