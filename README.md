@@ -62,3 +62,90 @@ These dependencies are used only in development:
 - Swashbuckle.AspNetCore
 - Swashbuckle.AspNetCore.Annotations
 - Microsoft.AspNetCore.OpenApi
+
+# Endpoints of the API
+
+## api/v1/Post/create-post
+
+This endpoint is used to save a post to the database.
+
+### Sample request
+
+```
+curl -X 'POST' \
+  'https://localhost:7005/api/v1/Post/create-post' \
+  -H 'accept: text/plain' \
+  -H 'Content-Type: application/json' \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJ1c2VyNCIsIm5iZiI6MTc5MTAzOTc2NywiZXhwIjoxNzkxMTI2MTY3LCJpYXQiOjE3OTEwMzk3NjcsImlzcyI6Imh0dHBzOi8vd3d3LnBvc3Rvc2hhcmUuY29tLyJ9.mIOdSBXYeNVsoSy6erHvmHW3GlQEoKWa0rvmytcHgBI" \
+  -d '{
+    "partitionKey": "user4",
+    "type": "post",
+    "content": "Look at this amazing sunset!",
+    "media": [
+        {
+            "type": "image",
+            "url": "https://cdn.myapp.com/blobs/sunset.jpg",
+            "createdAt": "2026/08/31 21:30:00",
+            "visibility": "public"
+        }
+    ],
+    "createdAt": "2026/08/31 21:30:00",
+    "lastUpdatedAt": "2026/08/31 21:30:00",
+    "agent": "web",
+    "visibility": "public",
+    "stats": {
+        "thumbsUpReactions": 0,
+        "hahaReactions": 0,
+        "angryReactions": 0,
+        "loveReactions": 0,
+        "comments": 0,
+        "share": 0
+    },
+    "comments": [
+        {
+            "commentId": "c_001",
+            "userId": "user_456",
+            "text": "Sample text",
+            "createdAt": "2026/08/31 21:33:00",
+            "lastUpdatedAt": "2026/08/31 21:33:00",
+            "subComments": [
+                {
+                    "subCommentId": "sc_001",
+                    "userId": "user_123",
+                    "text": "Sample text",
+                    "createdAt": "2026/08/31 21:35:00",
+                    "lastUpdatedAt": "2026/08/31 21:30:00"
+                }
+            ]
+        }
+    ]
+}'
+```
+
+### Responses
+
+- 201 - Post inserted
+  	
+  ```json
+  {    
+    "result": true,
+    "errorDescription": "",
+    "errorCode": "00000"
+  }
+  ```
+
+- 400 -
+
+  ```json
+  {
+    "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+    "title": "One or more validation errors occurred.",
+    "status": 400,
+    "errors": {
+        "PartitionKey": [
+            "partitionKey is required for Cosmos DB compatibility"
+        ]
+    },
+    "traceId": "00-c603c299c831b1043fe68ec409cb9d20-4e13003f77fb5e07-00"
+  }
+  ```
