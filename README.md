@@ -149,3 +149,14 @@ curl -X 'POST' \
     "traceId": "00-c603c299c831b1043fe68ec409cb9d20-4e13003f77fb5e07-00"
   }
   ```
+
+- 500 -
+  
+  ```json
+  {
+    "result": false,
+    "errorCode": "",
+    "errorDesc": "No connection could be made because the target machine actively refused it. (localhost:7224)",
+    "posts": null
+  }
+  ```
