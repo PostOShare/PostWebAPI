@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PostWebApiCommon;
 using PostWebApiCommon.Models.DTO;
+using PostWebApiCommon.Models.DTO.Response;
 using PostWebApiService.Services;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
@@ -44,18 +45,20 @@ namespace PostWebApi.Controllers
         [SwaggerResponse((int)HttpStatusCode.Unauthorized)]
         public async Task<ActionResult<PostDto>> CreatePost([FromBody] PostDto newPost)
         {
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
-
-            if (string.IsNullOrEmpty(currentUserId))
-            {
-                return Unauthorized(new { message = "Invalid token claims." });
-            }
-
-            string? accessToken = await HttpContext.GetTokenAsync("access_token");
-            var response = await _postService.CreatePost(newPost, currentUserId, accessToken!);
-
+            BaseResponseDTO response = new BaseResponseDTO();
             try
             {
+                var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
+
+                if (string.IsNullOrEmpty(currentUserId))
+                {
+                    return Unauthorized(new { message = "Invalid token claims." });
+                }
+
+                string? accessToken = await HttpContext.GetTokenAsync("access_token");
+                response = await _postService.CreatePost(newPost, currentUserId, accessToken!);
+
+
                 if (response.Result)
                 {
                     return Created("create-post", response);
@@ -63,7 +66,7 @@ namespace PostWebApi.Controllers
                 else
                 {
                     return StatusCode(StatusCodes.Status500InternalServerError,
-                                      new PostWebApiCommon.Models.DTO.Response.PostResponseDTO
+                                      new PostResponseDTO
                                       {
                                           ErrorDesc = response.ErrorDesc,
                                           ErrorCode = response.ErrorCode,
@@ -71,10 +74,10 @@ namespace PostWebApi.Controllers
                                       });
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                                  new PostWebApiCommon.Models.DTO.Response.PostResponseDTO
+                                  new PostResponseDTO
                                   {
                                       ErrorDesc = ex.Message,
                                       ErrorCode = response.ErrorCode,
@@ -98,18 +101,19 @@ namespace PostWebApi.Controllers
         [SwaggerResponse((int)HttpStatusCode.Unauthorized)]
         public async Task<ActionResult<PostDto>> DeletePost(string postId)
         {
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
-
-            if (string.IsNullOrEmpty(currentUserId))
-            {
-                return Unauthorized(new { message = "Invalid token claims." });
-            }
-
-            string? accessToken = await HttpContext.GetTokenAsync("access_token");
-            var response = await _postService.DeletePost(postId, currentUserId, accessToken!);
-
+            BaseResponseDTO response = new BaseResponseDTO();
             try
             {
+                var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
+
+                if (string.IsNullOrEmpty(currentUserId))
+                {
+                    return Unauthorized(new { message = "Invalid token claims." });
+                }
+
+                string? accessToken = await HttpContext.GetTokenAsync("access_token");
+                response = await _postService.DeletePost(postId, currentUserId, accessToken!);
+
                 if (response.Result)
                 {
                     return Ok(response);
@@ -117,7 +121,7 @@ namespace PostWebApi.Controllers
                 else
                 {
                     return StatusCode(StatusCodes.Status500InternalServerError,
-                                      new PostWebApiCommon.Models.DTO.Response.PostResponseDTO
+                                      new PostResponseDTO
                                       {
                                           ErrorDesc = response.ErrorDesc,
                                           ErrorCode = response.ErrorCode,
@@ -128,7 +132,7 @@ namespace PostWebApi.Controllers
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                                  new PostWebApiCommon.Models.DTO.Response.PostResponseDTO
+                                  new PostResponseDTO
                                   {
                                       ErrorDesc = ex.Message,
                                       ErrorCode = response.ErrorCode,
@@ -152,19 +156,20 @@ namespace PostWebApi.Controllers
         [SwaggerResponse((int)HttpStatusCode.Unauthorized)]
         public async Task<ActionResult<PostDto>> UpdatePost(string postId, [FromBody] PostDto updatedPost)
         {
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
-
-            if (string.IsNullOrEmpty(currentUserId))
-            {
-                return Unauthorized(new { message = "Invalid token claims." });
-            }
-
-            updatedPost.Id = postId;
-            string? accessToken = await HttpContext.GetTokenAsync("access_token");
-            var response = await _postService.UpdatePost(postId, currentUserId, updatedPost, accessToken!);
-
+            BaseResponseDTO response = new BaseResponseDTO();
             try
             {
+                var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
+
+                if (string.IsNullOrEmpty(currentUserId))
+                {
+                    return Unauthorized(new { message = "Invalid token claims." });
+                }
+
+                updatedPost.Id = postId;
+                string? accessToken = await HttpContext.GetTokenAsync("access_token");
+                response = await _postService.UpdatePost(postId, currentUserId, updatedPost, accessToken!);
+
                 if (response.Result)
                 {
                     return Ok(response);
@@ -172,7 +177,7 @@ namespace PostWebApi.Controllers
                 else
                 {
                     return StatusCode(StatusCodes.Status500InternalServerError,
-                                      new PostWebApiCommon.Models.DTO.Response.PostResponseDTO
+                                      new PostResponseDTO
                                       {
                                           ErrorDesc = response.ErrorDesc,
                                           ErrorCode = response.ErrorCode,
@@ -183,7 +188,7 @@ namespace PostWebApi.Controllers
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                                  new PostWebApiCommon.Models.DTO.Response.PostResponseDTO
+                                  new PostResponseDTO
                                   {
                                       ErrorDesc = ex.Message,
                                       ErrorCode = response.ErrorCode,
@@ -205,18 +210,19 @@ namespace PostWebApi.Controllers
         [SwaggerResponse((int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult> GetAllPostsByUserId()
         {
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
-
-            if (string.IsNullOrEmpty(currentUserId))
-            {
-                return Unauthorized(new { message = "Invalid token claims." });
-            }
-
-            string? accessToken = await HttpContext.GetTokenAsync("access_token");
-            var response = await _postService.GetAllPostsByUserId(currentUserId, accessToken!);
-
+            PostResponseDTO response = new PostResponseDTO();
             try
             {
+                var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
+
+                if (string.IsNullOrEmpty(currentUserId))
+                {
+                    return Unauthorized(new { message = "Invalid token claims." });
+                }
+
+                string? accessToken = await HttpContext.GetTokenAsync("access_token");
+                response = await _postService.GetAllPostsByUserId(currentUserId, accessToken!);
+
                 if (response.ErrorCode.Equals(ErrorCodes.Success))
                 {
                     return Ok(response);
@@ -224,7 +230,7 @@ namespace PostWebApi.Controllers
                 else
                 {
                     return StatusCode(StatusCodes.Status500InternalServerError,
-                                      new PostWebApiCommon.Models.DTO.Response.PostResponseDTO
+                                      new PostResponseDTO
                                       {
                                           ErrorDesc = response.ErrorDesc,
                                           ErrorCode = response.ErrorCode,
@@ -235,7 +241,7 @@ namespace PostWebApi.Controllers
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                                  new PostWebApiCommon.Models.DTO.Response.PostResponseDTO
+                                  new PostResponseDTO
                                   {
                                       ErrorDesc = ex.Message,
                                       ErrorCode = response.ErrorCode,
