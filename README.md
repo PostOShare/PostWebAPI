@@ -148,15 +148,15 @@ curl -X 'POST' \
 }'
 ```
 
-### Responses
+### Sample Responses
 
 - 201 - Post inserted
   	
   ```json
   {    
     "result": true,
-    "errorDescription": "",
-    "errorCode": "00000"
+    "errorDescription": "Success",
+    "errorCode": "0000"
   }
   ```
 
@@ -176,12 +176,23 @@ curl -X 'POST' \
   }
   ```
 
+- 401 -
+
+  ```json
+  {
+    "result": false,
+    "errorCode": "0003",
+    "errorDesc": "User is not authorized to create this post.",
+    "posts": null
+  }
+  ```
+
 - 500 -
   
   ```json
   {
     "result": false,
-    "errorCode": "",
+    "errorCode": "0008",
     "errorDesc": "No connection could be made because the target machine actively refused it. (localhost:7224)",
     "posts": null
   }
@@ -192,7 +203,6 @@ curl -X 'POST' \
 This endpoint is used to update a post of the database. This endpoint needs a valid access token in the header in the form of Bearer Token. Please generate one based on the username from the [generate-accesstoken](https://github.com/PostOShare/IdentityWebApi#apiv1authgenerate-accesstoken) endpoint.
 
 ### Sample request
-
 
 ```
 curl -X 'PUT' \
@@ -254,15 +264,15 @@ curl -X 'PUT' \
 ```
 
 
-### Responses
+### Sample Responses
 
 - 200 - Post update completed
   	
   ```json
   {    
     "result": true,
-    "errorDescription": "",
-    "errorCode": "00000"
+    "errorDescription": "Success",
+    "errorCode": "0000"
   }
   ```
 
@@ -282,12 +292,12 @@ curl -X 'PUT' \
   }
   ```
 
-  - 401 -
+- 401 -
 
   ```json
   {
     "result": false,
-    "errorCode": "00003",
+    "errorCode": "0003",
     "errorDesc": "User is not authorized to delete this post.",
     "posts": null
   }
@@ -298,7 +308,7 @@ curl -X 'PUT' \
   ```json
   {
     "result": false,
-    "errorCode": "",
+    "errorCode": "0008",
     "errorDesc": "No connection could be made because the target machine actively refused it. (localhost:7224)",
     "posts": null
   }
