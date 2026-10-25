@@ -65,7 +65,7 @@ namespace PostWebApi.Controllers
                 }
                 else if (response.ErrorCode.Equals(ErrorCodes.UserNotAuthorizedToCreatePost))
                 {
-                    return Unauthorized(new PostResponseDTO
+                    return StatusCode(StatusCodes.Status403Forbidden, new PostResponseDTO
                     {
                         ErrorDesc = response.ErrorDesc,
                         ErrorCode = response.ErrorCode,
@@ -130,7 +130,7 @@ namespace PostWebApi.Controllers
                 }
                 else if (response.ErrorCode.Equals(ErrorCodes.UserNotAuthorizedToCreatePost))
                 {
-                    return Unauthorized(new PostResponseDTO
+                    return StatusCode(StatusCodes.Status403Forbidden, new PostResponseDTO
                     {
                         ErrorDesc = response.ErrorDesc,
                         ErrorCode = response.ErrorCode,
@@ -205,7 +205,7 @@ namespace PostWebApi.Controllers
                 }
                 else if (response.ErrorCode.Equals(ErrorCodes.UserNotAuthorizedToCreatePost))
                 {
-                    return Unauthorized(new PostResponseDTO
+                    return StatusCode(StatusCodes.Status403Forbidden, new PostResponseDTO
                     {
                         ErrorDesc = response.ErrorDesc,
                         ErrorCode = response.ErrorCode,
@@ -278,7 +278,7 @@ namespace PostWebApi.Controllers
                 }
                 else if (response.ErrorCode.Equals(ErrorCodes.UserNotAuthorizedToCreatePost))
                 {
-                    return Unauthorized(new PostResponseDTO
+                    return StatusCode(StatusCodes.Status403Forbidden, new PostResponseDTO
                     {
                         ErrorDesc = response.ErrorDesc,
                         ErrorCode = response.ErrorCode,
