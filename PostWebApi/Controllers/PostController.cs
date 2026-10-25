@@ -33,7 +33,7 @@ namespace PostWebApi.Controllers
         /// Saves a post to the database.
         /// </summary>
         /// <returns> 
-        /// Created, Unauthorized, data is invalid (Status BadRequest), or an internal error occurred 
+        /// Created, Unauthorized, data is invalid (Status BadRequest), Forbidden, or an internal error occurred 
         /// (Status InternalServerError)
         /// </returns>
         [HttpPost]
@@ -43,6 +43,7 @@ namespace PostWebApi.Controllers
         [SwaggerResponse((int)HttpStatusCode.BadRequest)]
         [SwaggerResponse((int)HttpStatusCode.InternalServerError)]
         [SwaggerResponse((int)HttpStatusCode.Unauthorized)]
+        [SwaggerResponse((int)HttpStatusCode.Forbidden)]
         public async Task<ActionResult<PostDto>> CreatePost([FromBody] PostDto newPost)
         {
             try
@@ -65,7 +66,7 @@ namespace PostWebApi.Controllers
                 }
                 else if (response.ErrorCode.Equals(ErrorCodes.UserNotAuthorizedToCreatePost))
                 {
-                    return Unauthorized(new PostResponseDTO
+                    return StatusCode(StatusCodes.Status403Forbidden, new PostResponseDTO
                     {
                         ErrorDesc = response.ErrorDesc,
                         ErrorCode = response.ErrorCode,
@@ -99,7 +100,7 @@ namespace PostWebApi.Controllers
         /// Deletes a post from the database.
         /// </summary>
         /// <returns> 
-        /// Ok, Unauthorized, data is invalid (Status BadRequest), or an internal error occurred 
+        /// Ok, Unauthorized, data is invalid (Status BadRequest), Forbidden, or an internal error occurred 
         /// (Status InternalServerError)
         /// </returns>
         [HttpDelete("{postId}")]
@@ -108,6 +109,7 @@ namespace PostWebApi.Controllers
         [SwaggerResponse((int)HttpStatusCode.BadRequest)]
         [SwaggerResponse((int)HttpStatusCode.InternalServerError)]
         [SwaggerResponse((int)HttpStatusCode.Unauthorized)]
+        [SwaggerResponse((int)HttpStatusCode.Forbidden)]
         public async Task<ActionResult<PostDto>> DeletePost(string postId)
         {
             try
@@ -130,7 +132,7 @@ namespace PostWebApi.Controllers
                 }
                 else if (response.ErrorCode.Equals(ErrorCodes.UserNotAuthorizedToCreatePost))
                 {
-                    return Unauthorized(new PostResponseDTO
+                    return StatusCode(StatusCodes.Status403Forbidden, new PostResponseDTO
                     {
                         ErrorDesc = response.ErrorDesc,
                         ErrorCode = response.ErrorCode,
@@ -173,7 +175,7 @@ namespace PostWebApi.Controllers
         /// Updates a post in the database.
         /// </summary>
         /// <returns> 
-        /// Ok, Unauthorized, data is invalid (Status BadRequest), or an internal error occurred 
+        /// Ok, Unauthorized, data is invalid (Status BadRequest), Forbidden, or an internal error occurred 
         /// (Status InternalServerError)
         /// </returns>
         [HttpPut("{postId}")]
@@ -182,6 +184,7 @@ namespace PostWebApi.Controllers
         [SwaggerResponse((int)HttpStatusCode.BadRequest)]
         [SwaggerResponse((int)HttpStatusCode.InternalServerError)]
         [SwaggerResponse((int)HttpStatusCode.Unauthorized)]
+        [SwaggerResponse((int)HttpStatusCode.Forbidden)]
         public async Task<ActionResult<PostDto>> UpdatePost(string postId, [FromBody] PostDto updatedPost)
         {
             try
@@ -205,7 +208,7 @@ namespace PostWebApi.Controllers
                 }
                 else if (response.ErrorCode.Equals(ErrorCodes.UserNotAuthorizedToCreatePost))
                 {
-                    return Unauthorized(new PostResponseDTO
+                    return StatusCode(StatusCodes.Status403Forbidden, new PostResponseDTO
                     {
                         ErrorDesc = response.ErrorDesc,
                         ErrorCode = response.ErrorCode,
@@ -248,7 +251,7 @@ namespace PostWebApi.Controllers
         /// Gets all posts based on currentUserId
         /// </summary>
         /// <returns> 
-        /// Ok, BadRequest, Unauthorized, or an internal error occurred (Status InternalServerError)
+        /// Ok, BadRequest, Unauthorized, Forbidden, or an internal error occurred (Status InternalServerError)
         /// </returns>
         [HttpGet("getposts-byuser")]
         [SwaggerOperation("Gets all posts based on currentUserId")]
@@ -256,6 +259,7 @@ namespace PostWebApi.Controllers
         [SwaggerResponse((int)HttpStatusCode.BadRequest)]
         [SwaggerResponse((int)HttpStatusCode.Unauthorized)]
         [SwaggerResponse((int)HttpStatusCode.InternalServerError)]
+        [SwaggerResponse((int)HttpStatusCode.Forbidden)]
         public async Task<ActionResult> GetAllPostsByUserId()
         {
             try
@@ -278,7 +282,7 @@ namespace PostWebApi.Controllers
                 }
                 else if (response.ErrorCode.Equals(ErrorCodes.UserNotAuthorizedToCreatePost))
                 {
-                    return Unauthorized(new PostResponseDTO
+                    return StatusCode(StatusCodes.Status403Forbidden, new PostResponseDTO
                     {
                         ErrorDesc = response.ErrorDesc,
                         ErrorCode = response.ErrorCode,
