@@ -93,7 +93,7 @@ These dependencies are used only in development:
 
 ## api/v1/Post/create-post
 
-This endpoint is used to save a post to the database.
+This endpoint is used to save a post to the database. This endpoint needs a valid access token in the header in the form of Bearer Token. Please generate one based on the username from the [generate-accesstoken](https://github.com/PostOShare/IdentityWebApi#apiv1authgenerate-accesstoken) endpoint.
 
 ### Sample request
 
@@ -173,6 +173,123 @@ curl -X 'POST' \
         ]
     },
     "traceId": "00-c603c299c831b1043fe68ec409cb9d20-4e13003f77fb5e07-00"
+  }
+  ```
+
+- 500 -
+  
+  ```json
+  {
+    "result": false,
+    "errorCode": "",
+    "errorDesc": "No connection could be made because the target machine actively refused it. (localhost:7224)",
+    "posts": null
+  }
+  ```
+
+## api/v1/Post/update-post
+
+This endpoint is used to update a post of the database. This endpoint needs a valid access token in the header in the form of Bearer Token. Please generate one based on the username from the [generate-accesstoken](https://github.com/PostOShare/IdentityWebApi#apiv1authgenerate-accesstoken) endpoint.
+
+### Sample request
+
+
+```
+curl -X 'PUT' \
+  'https://localhost:7005/api/v1/Post/6ab7e2eeaf52567676d23196' \
+  -H 'accept: text/plain' \
+  -H 'Content-Type: application/json' \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJ1c2VyNCIsIm5iZiI6MTc5MTAzOTc2NywiZXhwIjoxNzkxMTI2MTY3LCJpYXQiOjE3OTEwMzk3NjcsImlzcyI6Imh0dHBzOi8vd3d3LnBvc3Rvc2hhcmUuY29tLyJ9.mIOdSBXYeNVsoSy6erHvmHW3GlQEoKWa0rvmytcHgBI" \
+  -d '{
+    "partitionKey": "user_123",
+    "type": "post",
+    "content": "Look at this amazing sunset!",
+    "media": [
+        {
+            "type": "image",
+            "url": "https://cdn.myapp.com/blobs/sunset1.jpg",
+            "createdAt": "2026/08/31 21:30:00",
+            "visibility": "public"
+        }
+    ],
+    "createdAt": "2026/08/31 21:30:00",
+    "lastUpdatedAt": "2026/08/31 21:30:00",
+    "agent": "web",
+    "visibility": "public",
+    "stats": {
+        "thumbsUpReactions": 14,
+        "hahaReactions": 0,
+        "angryReactions": 0,
+        "loveReactions": 8,
+        "comments": 0,
+        "share": 0
+    },
+    "comments": [
+        {
+            "commentId": "c_001",
+            "userId": "user_456",
+            "text": "Sample text",
+            "createdAt": "2026/08/31 21:33:00",
+            "lastUpdatedAt": "2026/08/31 21:33:00",
+            "subComments": [
+                {
+                    "subCommentId": "sc_001",
+                    "userId": "user_123",
+                    "text": "Sample text",
+                    "createdAt": "2026/08/31 21:35:00",
+                    "lastUpdatedAt": "2026/08/31 21:30:00"
+                }
+            ]
+        },
+        {
+            "commentId": "c_002",
+            "userId": "user_458",
+            "text": "Sample text1",
+            "createdAt": "2026/09/24 21:33:00",
+            "lastUpdatedAt": "2026/09/24 21:33:00",
+            "subComments": []
+        }
+    ]
+}'
+```
+
+
+### Responses
+
+- 200 - Post update completed
+  	
+  ```json
+  {    
+    "result": true,
+    "errorDescription": "",
+    "errorCode": "00000"
+  }
+  ```
+
+- 400 -
+
+  ```json
+  {
+    "type": "https://tools.ietf.org/html/rfc9110#section-15.5.1",
+    "title": "One or more validation errors occurred.",
+    "status": 400,
+    "errors": {
+        "PartitionKey": [
+            "partitionKey is required for Cosmos DB compatibility"
+        ]
+    },
+    "traceId": "00-c603c299c831b1043fe68ec409cb9d20-4e13003f77fb5e07-00"
+  }
+  ```
+
+  - 401 -
+
+  ```json
+  {
+    "result": false,
+    "errorCode": "00003",
+    "errorDesc": "User is not authorized to delete this post.",
+    "posts": null
   }
   ```
 
