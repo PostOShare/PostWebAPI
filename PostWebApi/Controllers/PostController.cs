@@ -45,23 +45,32 @@ namespace PostWebApi.Controllers
         [SwaggerResponse((int)HttpStatusCode.Unauthorized)]
         public async Task<ActionResult<PostDto>> CreatePost([FromBody] PostDto newPost)
         {
-            BaseResponseDTO response = new BaseResponseDTO();
             try
             {
                 var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
 
-                if (string.IsNullOrEmpty(currentUserId))
-                {
-                    return Unauthorized(new { message = "Invalid token claims." });
-                }
-
                 string? accessToken = await HttpContext.GetTokenAsync("access_token");
-                response = await _postService.CreatePost(newPost, currentUserId, accessToken!);
 
+                #pragma warning disable CS8604 // Possible null reference argument
+                var response = await _postService.CreatePost(newPost, currentUserId, accessToken);
+                #pragma warning restore CS8604 // Possible null reference argument
 
                 if (response.Result)
                 {
                     return Created("create-post", response);
+                }
+                else if (response.ErrorCode.Equals(ErrorCodes.UsernameTokenError))
+                {
+                    return BadRequest(response);
+                }
+                else if (response.ErrorCode.Equals(ErrorCodes.UserNotAuthorizedToCreatePost))
+                {
+                    return Unauthorized(new PostResponseDTO
+                    {
+                        ErrorDesc = response.ErrorDesc,
+                        ErrorCode = response.ErrorCode,
+                        Result = false
+                    });
                 }
                 else
                 {
@@ -80,7 +89,7 @@ namespace PostWebApi.Controllers
                                   new PostResponseDTO
                                   {
                                       ErrorDesc = ex.Message,
-                                      ErrorCode = response.ErrorCode,
+                                      ErrorCode = ErrorCodes.InternalServerError,
                                       Result = false
                                   });
             }
@@ -101,22 +110,41 @@ namespace PostWebApi.Controllers
         [SwaggerResponse((int)HttpStatusCode.Unauthorized)]
         public async Task<ActionResult<PostDto>> DeletePost(string postId)
         {
-            BaseResponseDTO response = new BaseResponseDTO();
             try
             {
                 var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
 
-                if (string.IsNullOrEmpty(currentUserId))
-                {
-                    return Unauthorized(new { message = "Invalid token claims." });
-                }
-
                 string? accessToken = await HttpContext.GetTokenAsync("access_token");
-                response = await _postService.DeletePost(postId, currentUserId, accessToken!);
+
+                #pragma warning disable CS8604 // Possible null reference argument
+                var response = await _postService.DeletePost(postId, currentUserId, accessToken);
+                #pragma warning restore CS8604 // Possible null reference argument
 
                 if (response.Result)
                 {
                     return Ok(response);
+                }
+                else if (response.ErrorCode.Equals(ErrorCodes.UsernameTokenError))
+                {
+                    return BadRequest(response);
+                }
+                else if (response.ErrorCode.Equals(ErrorCodes.UserNotAuthorizedToCreatePost))
+                {
+                    return Unauthorized(new PostResponseDTO
+                    {
+                        ErrorDesc = response.ErrorDesc,
+                        ErrorCode = response.ErrorCode,
+                        Result = false
+                    });
+                }
+                else if (response.ErrorCode.Equals(ErrorCodes.PostNotFound))
+                {
+                    return NotFound(new PostResponseDTO
+                    {
+                        ErrorDesc = response.ErrorDesc,
+                        ErrorCode = response.ErrorCode,
+                        Result = false
+                    });
                 }
                 else
                 {
@@ -135,7 +163,7 @@ namespace PostWebApi.Controllers
                                   new PostResponseDTO
                                   {
                                       ErrorDesc = ex.Message,
-                                      ErrorCode = response.ErrorCode,
+                                      ErrorCode = ErrorCodes.InternalServerError,
                                       Result = false
                                   });
             }
@@ -156,23 +184,42 @@ namespace PostWebApi.Controllers
         [SwaggerResponse((int)HttpStatusCode.Unauthorized)]
         public async Task<ActionResult<PostDto>> UpdatePost(string postId, [FromBody] PostDto updatedPost)
         {
-            BaseResponseDTO response = new BaseResponseDTO();
             try
             {
                 var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
 
-                if (string.IsNullOrEmpty(currentUserId))
-                {
-                    return Unauthorized(new { message = "Invalid token claims." });
-                }
-
                 updatedPost.Id = postId;
                 string? accessToken = await HttpContext.GetTokenAsync("access_token");
-                response = await _postService.UpdatePost(postId, currentUserId, updatedPost, accessToken!);
+
+                #pragma warning disable CS8604 // Possible null reference argument
+                var response = await _postService.UpdatePost(postId, currentUserId, updatedPost, accessToken);
+                #pragma warning restore CS8604 // Possible null reference argument
 
                 if (response.Result)
                 {
                     return Ok(response);
+                }
+                else if (response.ErrorCode.Equals(ErrorCodes.UsernameTokenError))
+                {
+                    return BadRequest(response);
+                }
+                else if (response.ErrorCode.Equals(ErrorCodes.UserNotAuthorizedToCreatePost))
+                {
+                    return Unauthorized(new PostResponseDTO
+                    {
+                        ErrorDesc = response.ErrorDesc,
+                        ErrorCode = response.ErrorCode,
+                        Result = false
+                    });
+                }
+                else if (response.ErrorCode.Equals(ErrorCodes.PostNotFound))
+                {
+                    return NotFound(new PostResponseDTO
+                    {
+                        ErrorDesc = response.ErrorDesc,
+                        ErrorCode = response.ErrorCode,
+                        Result = false
+                    });
                 }
                 else
                 {
@@ -191,7 +238,7 @@ namespace PostWebApi.Controllers
                                   new PostResponseDTO
                                   {
                                       ErrorDesc = ex.Message,
-                                      ErrorCode = response.ErrorCode,
+                                      ErrorCode = ErrorCodes.InternalServerError,
                                       Result = false
                                   });
             }
@@ -201,31 +248,42 @@ namespace PostWebApi.Controllers
         /// Gets all posts based on currentUserId
         /// </summary>
         /// <returns> 
-        /// Ok, Unauthorized, or an internal error occurred (Status InternalServerError)
+        /// Ok, BadRequest, Unauthorized, or an internal error occurred (Status InternalServerError)
         /// </returns>
         [HttpGet("getposts-byuser")]
         [SwaggerOperation("Gets all posts based on currentUserId")]
         [SwaggerResponse((int)HttpStatusCode.OK)]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest)]
         [SwaggerResponse((int)HttpStatusCode.Unauthorized)]
         [SwaggerResponse((int)HttpStatusCode.InternalServerError)]
         public async Task<ActionResult> GetAllPostsByUserId()
         {
-            PostResponseDTO response = new PostResponseDTO();
             try
             {
                 var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
 
-                if (string.IsNullOrEmpty(currentUserId))
-                {
-                    return Unauthorized(new { message = "Invalid token claims." });
-                }
-
                 string? accessToken = await HttpContext.GetTokenAsync("access_token");
-                response = await _postService.GetAllPostsByUserId(currentUserId, accessToken!);
+
+                #pragma warning disable CS8604 // Possible null reference argument
+                var response = await _postService.GetAllPostsByUserId(currentUserId, accessToken);
+                #pragma warning restore CS8604 // Possible null reference argument
 
                 if (response.ErrorCode.Equals(ErrorCodes.Success))
                 {
                     return Ok(response);
+                }
+                else if (response.ErrorCode.Equals(ErrorCodes.UsernameTokenError))
+                {
+                    return BadRequest(response);
+                }
+                else if (response.ErrorCode.Equals(ErrorCodes.UserNotAuthorizedToCreatePost))
+                {
+                    return Unauthorized(new PostResponseDTO
+                    {
+                        ErrorDesc = response.ErrorDesc,
+                        ErrorCode = response.ErrorCode,
+                        Result = false
+                    });
                 }
                 else
                 {
@@ -244,7 +302,7 @@ namespace PostWebApi.Controllers
                                   new PostResponseDTO
                                   {
                                       ErrorDesc = ex.Message,
-                                      ErrorCode = response.ErrorCode,
+                                      ErrorCode = ErrorCodes.InternalServerError,
                                       Result = false
                                   });
             }

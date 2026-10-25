@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using PostWebApiCommon;
 using PostWebApiCommon.Helpers;
-using PostWebApiCommon.Models.DTO;
 using PostWebApiCommon.Models.DTO.Request;
 using PostWebApiCommon.Models.DTO.Response;
 using PostDto = PostWebApiCommon.Models.DTO.PostDto;
@@ -15,17 +14,15 @@ namespace PostWebApiService.Services
         private readonly IMongoCollection<PostDto> _postsCollection;
         private readonly string _identityAPIBaseUrl;
         private readonly string _validateAccessTokenUri;
-        private IHttpClientHelper _httpClientHelper;
         private readonly ILogger<PostService> _logger;
         private readonly IExternalHttpClientHelper _externalHttpClientHelper;
 
-        public PostService(IMongoDatabase database, IConfiguration configuration, IHttpClientHelper httpClientHelper, ILogger<PostService> logger, 
+        public PostService(IMongoDatabase database, IConfiguration configuration, ILogger<PostService> logger,
                            IExternalHttpClientHelper externalHttpClientHelper)
         {
             _postsCollection = database.GetCollection<PostDto>("Posts");
             _identityAPIBaseUrl = configuration[Constants.IdentityAPIBaseUrl]!;
             _validateAccessTokenUri = configuration[Constants.ValidateAccessTokenEndpoint]!;
-            _httpClientHelper = httpClientHelper;
             _externalHttpClientHelper = externalHttpClientHelper;
             _logger = logger;
         }
@@ -42,44 +39,43 @@ namespace PostWebApiService.Services
                     {
                         Result = false,
                         ErrorCode = ErrorCodes.UserNotAuthorizedToCreatePost,
-                        ErrorDesc = "User is not authorized to create this post."
+                        ErrorDesc = ErrorDescriptions.UserNotAuthorizedToCreatePost
                     };
                 }
 
                 _logger.LogInformation("Route: {method}, User: {username}, Access token: {accessToken} | Validating tokens",
                                    Constants.CreatePostRoute, postDto.PartitionKey, accessToken);
-                var dto = new ValidateTokenRequestDTO { CurrentUserId = currentUserId, AccessToken = accessToken };
-                var response = await _externalHttpClientHelper.PostAsyncExternal<ValidateTokenRequestDTO, AuthResultDTO>(_identityAPIBaseUrl, _validateAccessTokenUri, dto);
+                var response = await ValidateToken(currentUserId, accessToken);
 
-                if(!response.Result)
+                if (!response.Result)
                 {
                     _logger.LogInformation("Route: {method}, User: {username} | Token validation failed with error: {error}",
                                    Constants.CreatePostRoute, postDto.PartitionKey, response.ErrorDescription);
                     return new BaseResponseDTO
                     {
                         Result = false,
-                        ErrorCode = ErrorCodes.UserNotAuthorizedToCreatePost,
-                        ErrorDesc = "User is not authorized to create this post."
+                        ErrorCode = response.ErrorCode,
+                        ErrorDesc = response.ErrorDescription
                     };
                 }
 
                 _logger.LogInformation("Route: {method}, User: {username} | Creating post.", Constants.CreatePostRoute, postDto.PartitionKey);
                 await _postsCollection.InsertOneAsync(postDto);
+
+                _logger.LogInformation("Route: {method}, User: {username} | Post created successfully", Constants.CreatePostRoute, postDto.PartitionKey);
+                return new BaseResponseDTO
+                {
+                    Result = true,
+                    ErrorCode = ErrorCodes.Success,
+                    ErrorDesc = ErrorDescriptions.Success
+                };
             }
             catch (Exception ex)
             {
                 _logger.LogError("Route: {method}, User: {username} | Exception occurred while saving post: {exception}",
                                    Constants.CreatePostRoute, postDto.PartitionKey, ex);
                 throw;
-            }
-
-            _logger.LogInformation("Route: {method}, User: {username} | Post created successfully", Constants.CreatePostRoute, postDto.PartitionKey);
-            return new BaseResponseDTO
-            {
-                Result = true,
-                ErrorCode = ErrorCodes.Success,
-                ErrorDesc = string.Empty
-            };
+            }            
         }
 
         public async Task<BaseResponseDTO> DeletePost(string postId, string currentUserId, string accessToken)
@@ -88,9 +84,8 @@ namespace PostWebApiService.Services
             {
                 _logger.LogInformation("Route: {method}, User: {username}, Access token: {accessToken} | Validating tokens",
                                    Constants.DeletePostRoute, currentUserId, accessToken);
-                var dto = new ValidateTokenRequestDTO { CurrentUserId = currentUserId, AccessToken = accessToken };
-                var response = await _externalHttpClientHelper.PostAsyncExternal<ValidateTokenRequestDTO, AuthResultDTO>(_identityAPIBaseUrl, _validateAccessTokenUri, dto);
 
+                var response = await ValidateToken(currentUserId, accessToken);
                 if (!response.Result)
                 {
                     _logger.LogInformation("Route: {method}, User: {username} | Token validation failed with error: {error}",
@@ -98,8 +93,8 @@ namespace PostWebApiService.Services
                     return new BaseResponseDTO
                     {
                         Result = false,
-                        ErrorCode = ErrorCodes.UserNotAuthorizedToCreatePost,
-                        ErrorDesc = "User is not authorized to create this post."
+                        ErrorCode = response.ErrorCode,
+                        ErrorDesc = response.ErrorDescription
                     };
                 }
 
@@ -114,7 +109,7 @@ namespace PostWebApiService.Services
                     {
                         Result = false,
                         ErrorCode = ErrorCodes.PostNotFound,
-                        ErrorDesc = "Post not found."
+                        ErrorDesc = ErrorDescriptions.PostNotFound
                     };
                 }
 
@@ -128,10 +123,10 @@ namespace PostWebApiService.Services
                     {
                         Result = false,
                         ErrorCode = ErrorCodes.UserNotAuthorizedToDeletePost,
-                        ErrorDesc = "User is not authorized to delete this post."
+                        ErrorDesc = ErrorDescriptions.UserNotAuthorizedToDeletePost
                     };
                 }
-                
+
                 _logger.LogInformation("Route: {method}, Post Id: {postId} | Deleting post", Constants.DeletePostRoute, postId);
                 var deleteResult = await _postsCollection.DeleteOneAsync(filter);
 
@@ -142,24 +137,24 @@ namespace PostWebApiService.Services
                     {
                         Result = false,
                         ErrorCode = ErrorCodes.FailedToDeletePost,
-                        ErrorDesc = "Failed to delete post."
+                        ErrorDesc = ErrorDescriptions.FailedToDeletePost
                     };
                 }
+
+                _logger.LogInformation("Route: {method}, Post Id: {postId} | Post deleted successfully", Constants.DeletePostRoute, postId);
+                return new BaseResponseDTO
+                {
+                    Result = true,
+                    ErrorCode = ErrorCodes.Success,
+                    ErrorDesc = ErrorDescriptions.Success
+                };
             }
             catch (Exception ex)
             {
                 _logger.LogError("Route: {method}, Post Id: {postId} | Exception occurred while deleting post: {exception}",
                                    Constants.DeletePostRoute, postId, ex);
                 throw;
-            }
-
-            _logger.LogInformation("Route: {method}, Post Id: {postId} | Post deleted successfully", Constants.DeletePostRoute, postId);
-            return new BaseResponseDTO
-            {
-                Result = true,
-                ErrorCode = ErrorCodes.Success,
-                ErrorDesc = string.Empty
-            };
+            }           
         }
 
         public async Task<BaseResponseDTO> UpdatePost(string postId, string currentUserId, PostDto updatedPost, string accessToken)
@@ -168,8 +163,7 @@ namespace PostWebApiService.Services
             {
                 _logger.LogInformation("Route: {method}, User: {username}, Access token: {accessToken} | Validating tokens",
                                    Constants.UpdatePostRoute, currentUserId, accessToken);
-                var dto = new ValidateTokenRequestDTO { CurrentUserId = currentUserId, AccessToken = accessToken };
-                var response = await _externalHttpClientHelper.PostAsyncExternal<ValidateTokenRequestDTO, AuthResultDTO>(_identityAPIBaseUrl, _validateAccessTokenUri, dto);
+                var response = await ValidateToken(currentUserId, accessToken);
 
                 if (!response.Result)
                 {
@@ -178,8 +172,8 @@ namespace PostWebApiService.Services
                     return new BaseResponseDTO
                     {
                         Result = false,
-                        ErrorCode = ErrorCodes.UserNotAuthorizedToCreatePost,
-                        ErrorDesc = "User is not authorized to create this post."
+                        ErrorCode = response.ErrorCode,
+                        ErrorDesc = response.ErrorDescription
                     };
                 }
 
@@ -194,7 +188,7 @@ namespace PostWebApiService.Services
                     {
                         Result = false,
                         ErrorCode = ErrorCodes.PostNotFound,
-                        ErrorDesc = "Post not found."
+                        ErrorDesc = ErrorDescriptions.PostNotFound
                     };
                 }
 
@@ -207,11 +201,11 @@ namespace PostWebApiService.Services
                     return new BaseResponseDTO
                     {
                         Result = false,
-                        ErrorCode = ErrorCodes.UserNotAuthorizedToDeletePost,
-                        ErrorDesc = "User is not authorized to delete this post."
+                        ErrorCode = ErrorCodes.UserNotAuthorizedToUpdatePost,
+                        ErrorDesc = ErrorDescriptions.UserNotAuthorizedToUpdatePost
                     };
                 }
-                
+
                 _logger.LogInformation("Route: {method}, Post Id: {postId} | Updating post", Constants.UpdatePostRoute, postId);
                 var updateResult = await _postsCollection.ReplaceOneAsync(filter, updatedPost);
 
@@ -223,24 +217,24 @@ namespace PostWebApiService.Services
                     {
                         Result = false,
                         ErrorCode = ErrorCodes.FailedToUpdatePost,
-                        ErrorDesc = "Failed to update post."
+                        ErrorDesc = ErrorDescriptions.FailedToUpdatePost
                     };
                 }
+
+                _logger.LogInformation("Route: {method}, Post Id: {postId} | Post updated successfully", Constants.UpdatePostRoute, postId);
+                return new BaseResponseDTO
+                {
+                    Result = true,
+                    ErrorCode = ErrorCodes.Success,
+                    ErrorDesc = ErrorDescriptions.Success
+                };
             }
             catch (Exception ex)
             {
                 _logger.LogError("Route: {method}, Post Id: {postId} | Exception occurred while updating post: {exception}",
                                    Constants.UpdatePostRoute, postId, ex);
                 throw;
-            }
-
-            _logger.LogInformation("Route: {method}, Post Id: {postId} | Post updated successfully", Constants.UpdatePostRoute, postId);
-            return new BaseResponseDTO
-            {
-                Result = true,
-                ErrorCode = ErrorCodes.Success,
-                ErrorDesc = string.Empty
-            };
+            }            
         }
 
         public async Task<PostResponseDTO> GetAllPostsByUserId(string currentUserId, string accessToken)
@@ -249,8 +243,7 @@ namespace PostWebApiService.Services
             {
                 _logger.LogInformation("Route: {method}, User: {username}, Access token: {accessToken} | Validating tokens",
                                    Constants.GetAllPostsByUserIdRoute, currentUserId, accessToken);
-                var dto = new ValidateTokenRequestDTO { CurrentUserId = currentUserId, AccessToken = accessToken };
-                var response = await _externalHttpClientHelper.PostAsyncExternal<ValidateTokenRequestDTO, AuthResultDTO>(_identityAPIBaseUrl, _validateAccessTokenUri, dto);
+                var response = await ValidateToken(currentUserId, accessToken);
 
                 if (!response.Result)
                 {
@@ -259,8 +252,8 @@ namespace PostWebApiService.Services
                     return new PostResponseDTO
                     {
                         Result = false,
-                        ErrorCode = ErrorCodes.UserNotAuthorizedToCreatePost,
-                        ErrorDesc = "User is not authorized to create this post."
+                        ErrorCode = response.ErrorCode,
+                        ErrorDesc = response.ErrorDescription
                     };
                 }
 
@@ -273,19 +266,19 @@ namespace PostWebApiService.Services
                     _logger.LogInformation("Route: {method} | No posts found for user {userId}", Constants.GetAllPostsByUserIdRoute, currentUserId);
                     return new PostResponseDTO
                     {
-                        Result = false,
+                        Result = true,
                         ErrorCode = ErrorCodes.PostNotFound,
-                        ErrorDesc = "Posts not found."
+                        ErrorDesc = ErrorDescriptions.PostNotFound,
+                        Posts = posts
                     };
                 }
-
 
                 _logger.LogInformation("Route: {method} | Posts for user {userId} retrieved", Constants.GetAllPostsByUserIdRoute, currentUserId);
                 return new PostResponseDTO
                 {
                     Result = true,
                     ErrorCode = ErrorCodes.Success,
-                    ErrorDesc = string.Empty,
+                    ErrorDesc = ErrorDescriptions.Success,
                     Posts = posts
                 };
             }
@@ -295,6 +288,13 @@ namespace PostWebApiService.Services
                                    Constants.GetAllPostsByUserIdRoute, ex);
                 throw;
             }
+        }
+
+        private async Task<AuthResultDTO> ValidateToken(string currentUserId, string accessToken)
+        {
+            var dto = new ValidateTokenRequestDTO { CurrentUserId = currentUserId, AccessToken = accessToken };
+            var response = await _externalHttpClientHelper.PostAsyncExternal<ValidateTokenRequestDTO, AuthResultDTO>(_identityAPIBaseUrl, _validateAccessTokenUri, dto);
+            return response;
         }
     }
 }
