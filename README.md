@@ -315,7 +315,7 @@ curl -X 'PUT' \
     "errorCode": "0001",
     "errorDesc": "Post not found",
     "posts": null
-}
+  }
   ```
 
 - 500 -
@@ -383,7 +383,7 @@ curl -X 'DELETE' \
     "errorCode": "0001",
     "errorDesc": "Post not found",
     "posts": null
-}
+  }
   ```
 
 - 500 -
