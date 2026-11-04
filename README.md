@@ -202,7 +202,7 @@ curl -X 'POST' \
 
 ## api/v1/Post/update-post
 
-This endpoint is used to update a post of the database. This endpoint needs a valid access token in the header in the form of Bearer Token. Please generate one based on the username from the [generate-accesstoken](https://github.com/PostOShare/IdentityWebApi#apiv1authgenerate-accesstoken) endpoint.
+This endpoint is used to update a post in the database. This endpoint needs a valid access token in the header in the form of Bearer Token. Please generate one based on the username from the [generate-accesstoken](https://github.com/PostOShare/IdentityWebApi#apiv1authgenerate-accesstoken) endpoint.
 
 ### Sample request
 
@@ -301,10 +301,89 @@ curl -X 'PUT' \
   ```json
   {
     "result": false,
+    "errorCode": "0004",
+    "errorDesc": "User is not authorized to update this post.",
+    "posts": null
+  }
+  ```
+
+- 404 -
+
+  ```json
+  {
+    "result": false,
+    "errorCode": "0001",
+    "errorDesc": "Post not found",
+    "posts": null
+}
+  ```
+
+- 500 -
+  
+  ```json
+  {
+    "result": false,
+    "errorCode": "0008",
+    "errorDesc": "No connection could be made because the target machine actively refused it. (localhost:7224)",
+    "posts": null
+  }
+  ```
+
+## api/v1/Post/delete-post
+
+This endpoint is used to delete a post in the database. This endpoint needs a valid access token in the header in the form of Bearer Token. Please generate one based on the username from the [generate-accesstoken](https://github.com/PostOShare/IdentityWebApi#apiv1authgenerate-accesstoken) endpoint.
+
+### Sample request
+
+```
+curl -X 'DELETE' \
+  'https://localhost:7005/api/v1/Post/6adb6672583c7affffb6a7ef' \
+  -H 'accept: text/plain'
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJ1c2VyNCIsIm5iZiI6MTc5MTAzOTc2NywiZXhwIjoxNzkxMTI2MTY3LCJpYXQiOjE3OTEwMzk3NjcsImlzcyI6Imh0dHBzOi8vd3d3LnBvc3Rvc2hhcmUuY29tLyJ9.mIOdSBXYeNVsoSy6erHvmHW3GlQEoKWa0rvmytcHgBI"
+```
+
+- 200 - Post delete completed
+  	
+  ```json
+  {    
+    "result": true,
+    "errorDescription": "Success",
+    "errorCode": "0000"
+  }
+  ```
+
+- 400 -
+
+  ```json
+  {
+    "result": false,
+    "errorCode": "0006",
+    "errorDesc": "Invalid username and/or expired token"
+  }
+  ```
+  
+- 401
+  
+- 403 -
+
+  ```json
+  {
+    "result": false,
     "errorCode": "0003",
     "errorDesc": "User is not authorized to delete this post.",
     "posts": null
   }
+  ```
+
+- 404 -
+
+  ```json
+  {
+    "result": false,
+    "errorCode": "0001",
+    "errorDesc": "Post not found",
+    "posts": null
+}
   ```
 
 - 500 -
