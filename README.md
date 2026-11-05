@@ -534,4 +534,4 @@ curl -X 'GET' \
   ```
 
 # License
-This project is licensed under <a href="blob/v1/LICENSE"> Apache-2.0 license </a> 
+This project is licensed under <a href="LICENSE"> Apache-2.0 license </a> 
