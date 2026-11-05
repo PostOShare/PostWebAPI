@@ -396,3 +396,139 @@ curl -X 'DELETE' \
     "posts": null
   }
   ```
+
+## api/v1/Post/getposts-byuser
+
+This endpoint is used to obtain all posts of the user sending the request from the database. This endpoint needs a valid access token in the header in the form of Bearer Token. Please generate one based on the username from the [generate-accesstoken](https://github.com/PostOShare/IdentityWebApi#apiv1authgenerate-accesstoken) endpoint.
+
+### Sample request
+
+```
+curl -X 'GET' \
+  'https://localhost:7005/api/v1/Post/getposts-byuser' \
+  -H 'accept: */*'
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJ1c2VyNCIsIm5iZiI6MTc5MTAzOTc2NywiZXhwIjoxNzkxMTI2MTY3LCJpYXQiOjE3OTEwMzk3NjcsImlzcyI6Imh0dHBzOi8vd3d3LnBvc3Rvc2hhcmUuY29tLyJ9.mIOdSBXYeNVsoSy6erHvmHW3GlQEoKWa0rvmytcHgBI"
+```
+
+- 200 -
+  	
+  ```json
+  {
+    "result": true,
+    "errorCode": "0000",
+    "errorDesc": "Success",
+    "posts": [
+        {
+            "id": "6aeb6b980409c640b8bcb256",
+            "partitionKey": "user4",
+            "type": "post",
+            "content": "Look at this amazing sunset!",
+            "media": [
+                {
+                    "type": "image",
+                    "url": "https://cdn.myapp.com/blobs/sunset.jpg",
+                    "createdAt": "2026/08/31 21:30:00",
+                    "visibility": "public"
+                }
+            ],
+            "createdAt": "2026/08/31 21:30:00",
+            "lastUpdatedAt": "2026/08/31 21:30:00",
+            "agent": "web",
+            "visibility": "public",
+            "stats": {
+                "thumbsUpReactions": 0,
+                "hahaReactions": 0,
+                "angryReactions": 0,
+                "loveReactions": 0,
+                "comments": 0,
+                "share": 0
+            },
+            "comments": [
+                {
+                    "commentId": "c_001",
+                    "userId": "user_456",
+                    "text": "Sample text",
+                    "createdAt": "2026/08/31 21:33:00",
+                    "lastUpdatedAt": "2026/08/31 21:33:00",
+                    "subComments": [
+                        {
+                            "subCommentId": "sc_001",
+                            "userId": "user_123",
+                            "text": "Sample text",
+                            "createdAt": "2026/08/31 21:35:00",
+                            "lastUpdatedAt": "2026/08/31 21:30:00"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "6aecb8018234222445ea5097",
+            "partitionKey": "user4",
+            "type": "post",
+            "content": "Look at this amazing sunset1!",
+            "media": [
+                {
+                    "type": "image",
+                    "url": "https://cdn.myapp.com/blobs/sunset.jpg",
+                    "createdAt": "2026/08/31 21:30:00",
+                    "visibility": "public"
+                }
+            ],
+            "createdAt": "2026/08/31 21:25:00",
+            "lastUpdatedAt": "2026/08/31 21:26:00",
+            "agent": "web",
+            "visibility": "public",
+            "stats": {
+                "thumbsUpReactions": 0,
+                "hahaReactions": 0,
+                "angryReactions": 0,
+                "loveReactions": 0,
+                "comments": 0,
+                "share": 0
+            },
+            "comments": [
+                {
+                    "commentId": "c_001",
+                    "userId": "user_456",
+                    "text": "Sample text",
+                    "createdAt": "2026/08/31 21:33:00",
+                    "lastUpdatedAt": "2026/08/31 21:33:00",
+                    "subComments": [
+                        {
+                            "subCommentId": "sc_001",
+                            "userId": "user_123",
+                            "text": "Sample text",
+                            "createdAt": "2026/08/31 21:35:00",
+                            "lastUpdatedAt": "2026/08/31 21:30:00"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+  }
+  ```
+
+- 400 -
+
+  ```json
+  {
+    "result": false,
+    "errorCode": "0006",
+    "errorDesc": "Invalid username and/or expired token"
+  }
+  ```
+  
+- 401
+
+- 500 -
+  
+  ```json
+  {
+    "result": false,
+    "errorCode": "0008",
+    "errorDesc": "No connection could be made because the target machine actively refused it. (localhost:7224)",
+    "posts": null
+  }
+  ```
