@@ -342,6 +342,8 @@ curl -X 'DELETE' \
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJ1c2VyNCIsIm5iZiI6MTc5MTAzOTc2NywiZXhwIjoxNzkxMTI2MTY3LCJpYXQiOjE3OTEwMzk3NjcsImlzcyI6Imh0dHBzOi8vd3d3LnBvc3Rvc2hhcmUuY29tLyJ9.mIOdSBXYeNVsoSy6erHvmHW3GlQEoKWa0rvmytcHgBI"
 ```
 
+### Sample Responses
+
 - 200 - Post delete completed
   	
   ```json
@@ -399,7 +401,7 @@ curl -X 'DELETE' \
 
 ## api/v1/Post/getposts-byuser
 
-This endpoint is used to obtain all posts of the user sending the request from the database. This endpoint needs a valid access token in the header in the form of Bearer Token. Please generate one based on the username from the [generate-accesstoken](https://github.com/PostOShare/IdentityWebApi#apiv1authgenerate-accesstoken) endpoint.
+This endpoint is used to get all posts of the user sending the request from the database. This endpoint needs a valid access token in the header in the form of Bearer Token. Please generate one based on the username from the [generate-accesstoken](https://github.com/PostOShare/IdentityWebApi#apiv1authgenerate-accesstoken) endpoint.
 
 ### Sample request
 
@@ -409,6 +411,8 @@ curl -X 'GET' \
   -H 'accept: */*'
   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiJ1c2VyNCIsIm5iZiI6MTc5MTAzOTc2NywiZXhwIjoxNzkxMTI2MTY3LCJpYXQiOjE3OTEwMzk3NjcsImlzcyI6Imh0dHBzOi8vd3d3LnBvc3Rvc2hhcmUuY29tLyJ9.mIOdSBXYeNVsoSy6erHvmHW3GlQEoKWa0rvmytcHgBI"
 ```
+
+### Sample Responses
 
 - 200 -
   	
