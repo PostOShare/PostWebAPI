@@ -279,16 +279,7 @@ namespace PostWebApi.Controllers
                 else if (response.ErrorCode.Equals(ErrorCodes.UsernameTokenError))
                 {
                     return BadRequest(response);
-                }
-                else if (response.ErrorCode.Equals(ErrorCodes.UserNotAuthorizedToCreatePost))
-                {
-                    return StatusCode(StatusCodes.Status403Forbidden, new PostResponseDTO
-                    {
-                        ErrorDesc = response.ErrorDesc,
-                        ErrorCode = response.ErrorCode,
-                        Result = false
-                    });
-                }
+                }                
                 else
                 {
                     return StatusCode(StatusCodes.Status500InternalServerError,
