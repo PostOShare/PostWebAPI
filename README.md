@@ -532,3 +532,6 @@ curl -X 'GET' \
     "posts": null
   }
   ```
+
+# License
+This project is licensed under <a href="blob/v1/LICENSE"> Apache-2.0 license </a> 
