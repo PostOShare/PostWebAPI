@@ -59,3 +59,5 @@ nunit-*.xml
 
 /PostWebApi/.vs/PostWebApi/
 /PostWebApi/.vs/PostWebApi/v17/DocumentLayout.backup.json
+/PostWebApi/Properties/PublishProfiles
+/PostWebApi/.config
